@@ -7,6 +7,9 @@ custom:
   tableName: 'users-table-${sls:stage}'
   esbuild:
     packager: 'pnpm'
+    external:
+      - '@sparticuz/chromium'
+      - puppeteer
 
 provider:
   name: aws
@@ -19,6 +22,12 @@ functions:
       - httpApi:
           method: get
           path: /health
+  bestsellers:
+    handler: src/functions/bestsellers.bestsellers
+    events:
+      - httpApi:
+          method: get
+          path: /bestsellers
 
 plugins:
   - serverless-esbuild

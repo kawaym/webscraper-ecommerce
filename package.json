@@ -41,5 +41,9 @@
 	"lint-staged": {
 		"*.ts": "eslint --cache --fix",
 		"*.{js,css,md}": "prettier --write"
+	},
+	"dependencies": {
+		"@sparticuz/chromium": "^119.0.0",
+		"puppeteer": "^21.5.2"
 	}
 }
