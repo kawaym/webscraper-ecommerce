@@ -1,25 +1,26 @@
-import { extractAmazonCarouselInformation } from '../libs/extracts';
+import { extractAmazonBestsellingProductsInformation } from '../libs/extracts';
 import { accessPage, createBrowser } from '../libs/puppeteer';
 
-import type { ProductCarouselInfo } from '../libs/extracts';
+import type { BestsellingProductsInfo } from '../libs/extracts';
 
-export async function bestsellers(): Promise<ProductCarouselInfo> {
+export async function bestsellers(): Promise<BestsellingProductsInfo> {
 	const browser = await createBrowser();
 	const page = await accessPage(
 		browser,
 		'https://www.amazon.com.br/bestsellers',
 	);
 
-	await page.exposeFunction('extractAmazonCarouselInformation', (carousel) =>
-		extractAmazonCarouselInformation(carousel),
+	await page.exposeFunction(
+		'extractAmazonBestsellingProductsInformation',
+		(carousel) => extractAmazonBestsellingProductsInformation(carousel),
 	);
 
-	const bestSellingCarousel = await page.$eval(
-		'div#zg_left_col1 > div',
-		extractAmazonCarouselInformation,
+	const bestSellingProductsInfo = await page.$eval(
+		'div#zg_left_col1',
+		extractAmazonBestsellingProductsInformation,
 	);
 
 	await browser.close();
 
-	return bestSellingCarousel;
+	return bestSellingProductsInfo;
 }

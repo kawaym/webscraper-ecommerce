@@ -9,32 +9,86 @@ export interface ProductCarouselInfo {
 	products: ProductInfo[];
 }
 
-export function extractAmazonCarouselInformation(
-	carousel: HTMLDivElement,
-): ProductCarouselInfo {
-	const extractCard = (card: HTMLLIElement): ProductInfo => {
-		const productName: string =
-			card?.querySelector('a > span > div')?.innerHTML ?? 'productName';
-		const productImg: string =
-			card?.querySelector('div > img')?.getAttribute('src') ?? 'productImg';
-		const producPriceExtract: string =
-			card.querySelector('div > span > span')?.innerHTML.trim() ?? '0';
-		const productPrice: number =
-			parseInt(producPriceExtract?.substring(8).replace(',', '')) ?? 0;
-		return { productName, productImg, productPrice };
+export interface BestsellingProductsInfo {
+	baseUrl: string;
+	accessDate: string;
+	productsSortedByCategory: ProductCarouselInfo[];
+}
+
+// export function extractAmazonCarouselInformation(
+// 	carousel: HTMLDivElement,
+// ): ProductCarouselInfo {
+// 	const extractCard = (card: HTMLLIElement): ProductInfo => {
+// 		const productName: string =
+// 			card?.querySelector('a > span > div')?.innerHTML ?? 'productName';
+// 		const productImg: string =
+// 			card?.querySelector('div > img')?.getAttribute('src') ?? 'productImg';
+// 		const producPriceExtract: string =
+// 			card.querySelector('div > span > span')?.innerHTML.trim() ?? '0';
+// 		const productPrice: number =
+// 			parseInt(producPriceExtract?.substring(8).replace(',', '')) ?? 0;
+// 		return { productName, productImg, productPrice };
+// 	};
+
+// 	const category: string =
+// 		carousel?.querySelector('h2')?.innerText.substring(17) ?? 'category';
+
+// 	const productsRaw: NodeListOf<HTMLLIElement> =
+// 		carousel?.querySelectorAll('li.a-carousel-card');
+
+// 	const products: ProductInfo[] = [];
+
+// 	productsRaw.forEach((card) => {
+// 		products.push(extractCard(card));
+// 	});
+
+// 	return { category, products };
+// }
+
+export function extractAmazonBestsellingProductsInformation(
+	bestsellingContainer: HTMLDivElement,
+): BestsellingProductsInfo {
+	const extractCarousel = (carousel: HTMLDivElement): ProductCarouselInfo => {
+		const extractCard = (card: HTMLLIElement): ProductInfo => {
+			const productName: string =
+				card?.querySelector('a > span > div')?.innerHTML ?? 'productName';
+			const productImg: string =
+				card?.querySelector('div > img')?.getAttribute('src') ?? 'productImg';
+			const producPriceExtract: string =
+				card.querySelector('div > span > span')?.innerHTML.trim() ?? '0';
+			const productPrice: number =
+				parseInt(producPriceExtract?.substring(8).replace(',', '')) ?? 0;
+			return { productName, productImg, productPrice };
+		};
+
+		const category: string =
+			carousel?.querySelector('h2')?.innerText.substring(17) ?? 'category';
+
+		const productsRaw: NodeListOf<HTMLLIElement> =
+			carousel?.querySelectorAll('li.a-carousel-card');
+
+		const products: ProductInfo[] = [];
+
+		productsRaw.forEach((card) => {
+			products.push(extractCard(card));
+		});
+
+		return { category, products };
 	};
 
-	const category: string =
-		carousel?.querySelector('h2')?.innerText.substring(17) ?? 'category';
+	const baseUrl = bestsellingContainer.baseURI;
+	const accessDate = bestsellingContainer.ownerDocument.lastModified;
 
-	const productsRaw: NodeListOf<HTMLLIElement> =
-		carousel?.querySelectorAll('li.a-carousel-card');
+	console.log(accessDate);
 
-	const products: ProductInfo[] = [];
+	const carouselsRaw: NodeListOf<HTMLDivElement> =
+		bestsellingContainer?.querySelectorAll('div.a-carousel-container');
 
-	productsRaw.forEach((card) => {
-		products.push(extractCard(card));
+	const carousels: ProductCarouselInfo[] = [];
+
+	carouselsRaw.forEach((carousel) => {
+		carousels.push(extractCarousel(carousel));
 	});
 
-	return { category, products };
+	return { baseUrl, accessDate, productsSortedByCategory: carousels };
 }
