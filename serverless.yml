@@ -3,18 +3,32 @@ app: webscraper-ecommerce
 service: webscraper-ecommerce
 frameworkVersion: '3'
 
+custom:
+  esbuild:
+    external:
+      - '@sparticuz/chromium'
+      - 'puppeteer-core'
+
 provider:
   name: aws
   runtime: nodejs18.x
 
 functions:
   healthCheck:
-    handler: src/functions/health.health
+    handler: ./src/functions/health.health
     events:
       - httpApi:
           method: get
           path: /health
-
+  bestsellers:
+    handler: ./src/functions/bestsellers.bestsellers
+    events:
+      - httpApi:
+          method: get
+          path: /bestsellers/all
 plugins:
   - serverless-esbuild
   - serverless-offline
+
+package:
+  excludeDevDependencies: true

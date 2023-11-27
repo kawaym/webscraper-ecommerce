@@ -9,6 +9,8 @@
 		"moduleResolution": "Bundler",
 		"lib": ["ES2022", "DOM"],
 		"rootDir": "./",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
 		"strict": true
 	}
 }
