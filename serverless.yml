@@ -3,11 +3,6 @@ app: webscraper-ecommerce
 service: webscraper-ecommerce
 frameworkVersion: '3'
 
-custom:
-  tableName: 'users-table-${sls:stage}'
-  esbuild:
-    packager: 'pnpm'
-
 provider:
   name: aws
   runtime: nodejs18.x
