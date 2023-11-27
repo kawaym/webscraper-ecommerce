@@ -4,11 +4,13 @@
 		"strictNullChecks": true,
 		"sourceMap": true,
 		"allowJs": true,
-		"target": "ES6",
+		"target": "ES2022",
 		"outDir": ".build",
-		"moduleResolution": "node",
-		"lib": ["es2015", "DOM"],
+		"moduleResolution": "Bundler",
+		"lib": ["ES2022", "DOM"],
 		"rootDir": "./",
-		"esModuleInterop": true
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true
 	}
 }

@@ -12,7 +12,8 @@ export async function bestsellers(): Promise<BestsellingProductsInfo> {
 
 	await page.exposeFunction(
 		'extractAmazonBestsellingProductsInformation',
-		(carousel) => extractAmazonBestsellingProductsInformation(carousel),
+		(carousel: HTMLDivElement) =>
+			extractAmazonBestsellingProductsInformation(carousel),
 	);
 
 	const bestSellingProductsInfo = await page.$eval(

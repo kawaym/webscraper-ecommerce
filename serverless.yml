@@ -4,12 +4,10 @@ service: webscraper-ecommerce
 frameworkVersion: '3'
 
 custom:
-  tableName: 'users-table-${sls:stage}'
   esbuild:
-    packager: 'pnpm'
     external:
       - '@sparticuz/chromium'
-      - puppeteer
+      - 'puppeteer-core'
 
 provider:
   name: aws
@@ -17,18 +15,20 @@ provider:
 
 functions:
   healthCheck:
-    handler: src/functions/health.health
+    handler: ./src/functions/health.health
     events:
       - httpApi:
           method: get
           path: /health
   bestsellers:
-    handler: src/functions/bestsellers.bestsellers
+    handler: ./src/functions/bestsellers.bestsellers
     events:
       - httpApi:
           method: get
           path: /bestsellers
-
 plugins:
   - serverless-esbuild
   - serverless-offline
+
+package:
+  excludeDevDependencies: true
