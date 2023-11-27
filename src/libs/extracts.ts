@@ -2,6 +2,7 @@ export interface ProductInfo {
 	productName: string;
 	productImg: string;
 	productPrice: number;
+	productUrl: string;
 }
 
 export interface ProductCarouselInfo {
@@ -27,8 +28,11 @@ export function extractAmazonBestsellingProductsInformation(
 			const producPriceExtract: string =
 				card.querySelector('div > span > span')?.innerHTML.trim() ?? '0';
 			const productPrice: number =
-				parseInt(producPriceExtract?.substring(8).replace(',', '')) ?? 0;
-			return { productName, productImg, productPrice };
+				parseInt(
+					producPriceExtract?.substring(8).replace(',', '').replace('.', ''),
+				) ?? 0;
+			const productUrl: string = card.querySelector('a')?.href ?? 'productUrl';
+			return { productName, productImg, productPrice, productUrl };
 		};
 
 		const category: string =
