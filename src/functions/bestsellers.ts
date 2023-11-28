@@ -1,13 +1,12 @@
 import { extractAmazonBestsellingProductsInformation } from '../libs/extracts';
 import { accessPage, createBrowser } from '../libs/puppeteer';
-import { v4 as uuidv4 } from 'uuid';
-import AWS from 'aws-sdk';
 
 import type {
 	BestsellingProductsInfo,
 	ProductCarouselInfo,
 	ProductInfo,
 } from '../libs/extracts';
+import { insertItemIntoDb } from '../libs/dynamo';
 
 export async function allBestsellers(): Promise<BestsellingProductsInfo> {
 	const browser = await createBrowser();
@@ -29,21 +28,7 @@ export async function allBestsellers(): Promise<BestsellingProductsInfo> {
 
 	await browser.close();
 
-	const dynamoDb = new AWS.DynamoDB.DocumentClient();
-	const TABLE_NAME = process.env.DYNAMODB_BESTSELLINGPRODUCTS_TABLE;
-
-	if (TABLE_NAME === null || TABLE_NAME === undefined) {
-		throw new Error('dynamodb table missing');
-	}
-	const putParams = {
-		TableName: TABLE_NAME,
-		Item: {
-			productsId: uuidv4(),
-			BestsellingProducts: bestSellingProductsInfo,
-		},
-	};
-
-	await dynamoDb.put(putParams).promise();
+	await insertItemIntoDb(bestSellingProductsInfo);
 
 	return bestSellingProductsInfo;
 }
@@ -78,21 +63,7 @@ export async function bestsellers(): Promise<ProductInfo[]> {
 
 	await browser.close();
 
-	const dynamoDb = new AWS.DynamoDB.DocumentClient();
-	const TABLE_NAME = process.env.DYNAMODB_BESTSELLINGPRODUCTS_TABLE;
-
-	if (TABLE_NAME === null || TABLE_NAME === undefined) {
-		throw new Error('dynamodb table missing');
-	}
-	const putParams = {
-		TableName: TABLE_NAME,
-		Item: {
-			productsId: uuidv4(),
-			BestsellingProducts: bestsellers,
-		},
-	};
-
-	await dynamoDb.put(putParams).promise();
+	await insertItemIntoDb(bestsellers);
 
 	return bestsellers;
 }
