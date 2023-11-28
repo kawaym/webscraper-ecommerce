@@ -1,6 +1,8 @@
 <!--
 title: 'Serverless Webscraper Integrated with AWS'
-description: 'This template demonstrates how to develop and deploy a simple Node Express API service backed by DynamoDB running on AWS Lambda using the traditional Serverless Framework.'
+description: 'This project aims to provide a simple tool to scrape popular ecommerces for the bestselling items. Currently, it provides only Amazon bestsellers but other ecommerces should be integrated soon.
+
+Fully independent, the user can deploy themselves the scraper to the cloud or use it locally with native support.'
 layout: Doc
 framework: v3
 platform: AWS
