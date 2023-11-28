@@ -6,14 +6,18 @@ import type {
 	ProductCarouselInfo,
 	ProductInfo,
 } from '../libs/extracts';
-import { insertItemIntoDb } from '../libs/dynamo';
+import type { APIGatewayProxyEvent } from 'aws-lambda';
 
-export async function allBestsellers(): Promise<BestsellingProductsInfo> {
+import { insertItemIntoDb } from '../libs/dynamo';
+import { chooseService } from '../libs/utils';
+
+export async function allBestsellers(
+	event: APIGatewayProxyEvent,
+): Promise<BestsellingProductsInfo> {
+	const service = chooseService(event.queryStringParameters?.service);
+
 	const browser = await createBrowser();
-	const page = await accessPage(
-		browser,
-		'https://www.amazon.com.br/bestsellers',
-	);
+	const page = await accessPage(browser, service);
 
 	await page.exposeFunction(
 		'extractAmazonBestsellingProductsInformation',
@@ -33,12 +37,13 @@ export async function allBestsellers(): Promise<BestsellingProductsInfo> {
 	return bestSellingProductsInfo;
 }
 
-export async function bestsellers(): Promise<ProductInfo[]> {
+export async function bestsellers(
+	event: APIGatewayProxyEvent,
+): Promise<ProductInfo[]> {
+	const service = chooseService(event.queryStringParameters?.service);
+
 	const browser = await createBrowser();
-	const page = await accessPage(
-		browser,
-		'https://www.amazon.com.br/bestsellers',
-	);
+	const page = await accessPage(browser, service);
 
 	await page.exposeFunction(
 		'extractAmazonBestsellingProductsInformation',

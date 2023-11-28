@@ -25,9 +25,9 @@ Fully independent, the user can deploy themselves the scraper to the cloud or us
 
 Install serverless with:
 
-````bash
+```bash
   npm install -g serverless
-````
+```
 
 You should now have serverless installed but without an account setup, when deploying it should ask for the account and you can refer for more info on:
 
@@ -43,13 +43,13 @@ npm install
 
 Now you can deploy for use locally with:
 
-````bash
+```bash
 npm run deploy:local
-````
+```
 
 After running deploy:local, you should see output similar to:
 
-````bash
+```bash
 Starting Offline at stage dev (us-east-1)
 
 Offline [http for lambda] listening on http://localhost:3000
@@ -57,15 +57,15 @@ Function names exposed for local invocation by aws-sdk:
            * healthCheck: webscraper-ecommerce-dev-healthCheck
            * allBestsellers: webscraper-ecommerce-dev-allBestsellers
            * bestsellers: webscraper-ecommerce-dev-bestsellers
-````
+```
 
 This means the application is up and running and can be consumed on <http://localhost:3000>
 
 Alternativaly, you can deploy it on AWS, using the Cloudformation provided by Serverless deployment:
 
-````bash
+```bash
 npm run deploy:cloud
-````
+```
 
 After running deploy:cloud, you should see output similar to:
 
@@ -109,4 +109,4 @@ Which should result in the following response:
 
 ### API Documentation
 
-For more info about the API provided, such as endpoints and possible responses please refer to the [API Documentation](<https://ten-freedom-1f7.notion.site/API-Template-27b55a9fb7e04aba8ab555f4daa510fc?pvs=4>) (In portuguese)
+For more info about the API provided, such as endpoints and possible responses please refer to the [API Documentation](https://ten-freedom-1f7.notion.site/API-Template-27b55a9fb7e04aba8ab555f4daa510fc?pvs=4) (In portuguese)
