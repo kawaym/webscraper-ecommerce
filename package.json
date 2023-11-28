@@ -9,7 +9,9 @@
 		"lint": "eslint --ext .ts,.js .",
 		"type:check": "tsc",
 		"validate": "concurrently \"pnpm run lint\" \"pnpm type:check\" \"pnpm format:check\"",
-		"commit": "git-cz -S"
+		"commit": "git-cz -S",
+		"deploy:cloud": "sls deploy --verbose",
+		"deploy:local": "sls offline -noTimeout"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^18.4.3",
