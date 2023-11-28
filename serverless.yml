@@ -49,12 +49,19 @@ functions:
       - httpApi:
           method: get
           path: /health
+  allBestsellers:
+    handler: ./src/functions/bestsellers.allBestsellers
+    events:
+      - httpApi:
+          method: get
+          path: /bestsellers/all
   bestsellers:
     handler: ./src/functions/bestsellers.bestsellers
     events:
       - httpApi:
           method: get
-          path: /bestsellers/all
+          path: /bestsellers
+
 plugins:
   - serverless-esbuild
   - serverless-offline
