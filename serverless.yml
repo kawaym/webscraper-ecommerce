@@ -3,23 +3,68 @@ app: webscraper-ecommerce
 service: webscraper-ecommerce
 frameworkVersion: '3'
 
+resources:
+  Resources:
+    BestsellingProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: productsId
+            AttributeType: S
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: productsId
+            KeyType: HASH
+        TableName: ${self:service}-bestsellingProductsTable-${sls:stage}
+
 custom:
-  tableName: 'users-table-${sls:stage}'
   esbuild:
-    packager: 'pnpm'
+    external:
+      - 'aws-sdk'
+      - '@sparticuz/chromium'
+      - 'puppeteer-core'
+    exclude: []
 
 provider:
   name: aws
   runtime: nodejs18.x
+  environment:
+    DYNAMODB_BESTSELLINGPRODUCTS_TABLE: ${self:service}-bestsellingProductsTable-${sls:stage}
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 'dynamodb:PutItem'
+            - 'dynamodb:Get*'
+            - 'dynamodb:Scan*'
+            - 'dynamodb:UpdateItem'
+            - 'dynamodb:DeleteItem'
+          Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-bestsellingProductsTable-${sls:stage}
 
 functions:
   healthCheck:
-    handler: src/functions/health.health
+    handler: ./src/functions/health.health
     events:
       - httpApi:
           method: get
           path: /health
+  allBestsellers:
+    handler: ./src/functions/bestsellers.allBestsellers
+    events:
+      - httpApi:
+          method: get
+          path: /bestsellers/all
+  bestsellers:
+    handler: ./src/functions/bestsellers.bestsellers
+    events:
+      - httpApi:
+          method: get
+          path: /bestsellers
 
 plugins:
   - serverless-esbuild
   - serverless-offline
+
+package:
+  excludeDevDependencies: true
