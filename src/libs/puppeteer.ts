@@ -18,7 +18,11 @@ export async function createBrowser(): Promise<Browser> {
 export async function accessPage(browser: Browser, url: string): Promise<Page> {
 	const page = await browser.newPage();
 
-	await page.goto(url, { waitUntil: 'domcontentloaded' });
+	const status = (
+		await page.goto(url, { waitUntil: 'domcontentloaded' })
+	)?.status();
+	// status = status?.status();
+	console.log(status);
 
 	return page;
 }
