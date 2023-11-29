@@ -53,6 +53,7 @@
 		"aws-lambda": "^1.0.7",
 		"aws-sdk": "^2.1503.0",
 		"puppeteer-core": "^21.5.2",
+		"serverless-dynamodb-local": "^0.2.40",
 		"uuid": "^9.0.1"
 	}
 }

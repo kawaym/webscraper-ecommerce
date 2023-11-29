@@ -7,7 +7,7 @@ import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { insertItemIntoDb } from '../libs/dynamo';
 import { chooseLimit, chooseService } from '../libs/utils';
 
-interface HTTPResponse {
+export interface HTTPResponse {
 	statusCode: 200 | 404 | 400 | 500;
 	body?: string;
 }
@@ -28,9 +28,12 @@ export async function allBestsellers(
 
 		await browser.close();
 
-		await insertItemIntoDb(bestSellingProductsInfo);
+		const id = await insertItemIntoDb(bestSellingProductsInfo);
 
-		return { statusCode: 200, body: JSON.stringify(bestSellingProductsInfo) };
+		return {
+			statusCode: 200,
+			body: JSON.stringify({ eventId: id, bestSellingProductsInfo }),
+		};
 	} catch (error) {
 		let message: string;
 		if (error instanceof Error) {
@@ -88,8 +91,6 @@ export async function bestsellers(
 			bestSellingProductsInfo.productsSortedByCategory[0];
 
 		let i = 0;
-
-		console.log(bestSellingProductsInfo);
 		while (i < limit) {
 			// eslint-disable-next-line security/detect-object-injection
 			bestsellers.push(firstCarousel.products[i]);
@@ -98,9 +99,12 @@ export async function bestsellers(
 
 		await browser.close();
 
-		await insertItemIntoDb(bestsellers);
+		const id = await insertItemIntoDb(bestsellers);
 
-		return { statusCode: 200, body: JSON.stringify(bestsellers) };
+		return {
+			statusCode: 200,
+			body: JSON.stringify({ eventId: id, bestsellers }),
+		};
 	} catch (error) {
 		let message: string;
 		if (error instanceof Error) {
