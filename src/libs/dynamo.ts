@@ -10,7 +10,7 @@ export async function insertItemIntoDb(item: any): Promise<void> {
 	const putParams = {
 		TableName: TABLE_NAME,
 		Item: {
-			id: uuidv4(),
+			productsId: uuidv4(),
 			item,
 		},
 	};

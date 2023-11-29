@@ -1,4 +1,4 @@
-import { extractAmazonBestsellingProductsInformation } from '../libs/extracts';
+import { extractBestsellingProducts } from '../libs/extracts';
 import { accessPage, createBrowser } from '../libs/puppeteer';
 
 import type {
@@ -19,15 +19,9 @@ export async function allBestsellers(
 	const browser = await createBrowser();
 	const page = await accessPage(browser, service);
 
-	await page.exposeFunction(
-		'extractAmazonBestsellingProductsInformation',
-		(carousel: HTMLDivElement) =>
-			extractAmazonBestsellingProductsInformation(carousel),
-	);
-
-	const bestSellingProductsInfo = await page.$eval(
-		'div#zg_left_col1',
-		extractAmazonBestsellingProductsInformation,
+	const bestSellingProductsInfo = await extractBestsellingProducts(
+		page,
+		service,
 	);
 
 	await browser.close();
@@ -45,15 +39,9 @@ export async function bestsellers(
 	const browser = await createBrowser();
 	const page = await accessPage(browser, service);
 
-	await page.exposeFunction(
-		'extractAmazonBestsellingProductsInformation',
-		(carousel: HTMLDivElement) =>
-			extractAmazonBestsellingProductsInformation(carousel),
-	);
-
-	const bestSellingProductsInfo = await page.$eval(
-		'div#zg_left_col1',
-		extractAmazonBestsellingProductsInformation,
+	const bestSellingProductsInfo = await extractBestsellingProducts(
+		page,
+		service,
 	);
 
 	const bestsellers: ProductInfo[] = [];
