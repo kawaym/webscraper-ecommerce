@@ -16,14 +16,14 @@ export async function allBestsellers(
 	event: APIGatewayProxyEvent,
 ): Promise<HTTPResponse> {
 	try {
-		const service = chooseService(event.queryStringParameters?.service);
+		const baseUrl = chooseService(event.queryStringParameters?.service);
 
 		const browser = await createBrowser();
-		const page = await accessPage(browser, service);
+		const page = await accessPage(browser, baseUrl);
 
 		const bestSellingProductsInfo = await extractBestsellingProducts(
 			page,
-			service,
+			baseUrl,
 		);
 
 		await browser.close();
@@ -71,15 +71,15 @@ export async function bestsellers(
 	event: APIGatewayProxyEvent,
 ): Promise<HTTPResponse> {
 	try {
-		const service = chooseService(event.queryStringParameters?.service);
+		const baseUrl = chooseService(event.queryStringParameters?.service);
 		const limit = chooseLimit(event.queryStringParameters?.limit);
 
 		const browser = await createBrowser();
-		const page = await accessPage(browser, service);
+		const page = await accessPage(browser, baseUrl);
 
 		const bestSellingProductsInfo = await extractBestsellingProducts(
 			page,
-			service,
+			baseUrl,
 		);
 
 		const bestsellers: ProductInfo[] = [];
@@ -88,6 +88,8 @@ export async function bestsellers(
 			bestSellingProductsInfo.productsSortedByCategory[0];
 
 		let i = 0;
+
+		console.log(bestSellingProductsInfo);
 		while (i < limit) {
 			// eslint-disable-next-line security/detect-object-injection
 			bestsellers.push(firstCarousel.products[i]);
