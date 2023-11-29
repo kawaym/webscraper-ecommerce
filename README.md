@@ -92,18 +92,6 @@ curl '<LINK_PROVIDED_BY_DEPLOYMENT_METHOD>'/bestsellers
 Which should result in the following response:
 
 ```bash
-{"userId":"someUserId","name":"John"}
-```
-
-You can later retrieve the user by `userId` by calling the following endpoint:
-
-```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/users/someUserId
-```
-
-Which should result in the following response:
-
-```bash
 [{"productName": "...", "productImg": "...", "productPrice": 0000, "productUrl": "..."}, ...]
 ```
 
