@@ -59,6 +59,12 @@ functions:
       - httpApi:
           method: get
           path: /bestsellers
+  events:
+    handler: ./src/functions/events.readEvent
+    events:
+      - httpApi:
+          method: get
+          path: /events/{id}
 
 plugins:
   - serverless-esbuild

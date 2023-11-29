@@ -7,7 +7,7 @@ import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { insertItemIntoDb } from '../libs/dynamo';
 import { chooseLimit, chooseService } from '../libs/utils';
 
-interface HTTPResponse {
+export interface HTTPResponse {
 	statusCode: 200 | 404 | 400 | 500;
 	body?: string;
 }
