@@ -5,7 +5,7 @@ import type { ProductCarouselInfo, ProductInfo } from '../libs/extracts';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 
 import { insertItemIntoDb } from '../libs/dynamo';
-import { chooseService } from '../libs/utils';
+import { chooseLimit, chooseService } from '../libs/utils';
 
 interface HTTPResponse {
 	statusCode: 200 | 404 | 400 | 500;
@@ -72,6 +72,7 @@ export async function bestsellers(
 ): Promise<HTTPResponse> {
 	try {
 		const service = chooseService(event.queryStringParameters?.service);
+		const limit = chooseLimit(event.queryStringParameters?.limit);
 
 		const browser = await createBrowser();
 		const page = await accessPage(browser, service);
@@ -86,9 +87,11 @@ export async function bestsellers(
 		const firstCarousel: ProductCarouselInfo =
 			bestSellingProductsInfo.productsSortedByCategory[0];
 
-		for (let i = 0; i < 3; i++) {
+		let i = 0;
+		while (i < limit) {
 			// eslint-disable-next-line security/detect-object-injection
 			bestsellers.push(firstCarousel.products[i]);
+			i++;
 		}
 
 		await browser.close();

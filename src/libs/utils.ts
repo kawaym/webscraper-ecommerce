@@ -8,3 +8,16 @@ export function chooseService(service: string | undefined | null): string {
 
 	throw new Error('Service not found, please try again');
 }
+
+export function chooseLimit(limit: string | undefined | null): number {
+	if (limit === undefined || limit === null) {
+		return 3;
+	} else {
+		const number = parseInt(limit);
+		if (number === 0) {
+			return 3;
+		} else {
+			return number;
+		}
+	}
+}
