@@ -1,98 +1,142 @@
-import { extractAmazonBestsellingProductsInformation } from '../libs/extracts';
+import { extractBestsellingProducts } from '../libs/extracts';
 import { accessPage, createBrowser } from '../libs/puppeteer';
-import { v4 as uuidv4 } from 'uuid';
-import AWS from 'aws-sdk';
 
-import type {
-	BestsellingProductsInfo,
-	ProductCarouselInfo,
-	ProductInfo,
-} from '../libs/extracts';
+import type { ProductCarouselInfo, ProductInfo } from '../libs/extracts';
+import type { APIGatewayProxyEvent } from 'aws-lambda';
 
-export async function allBestsellers(): Promise<BestsellingProductsInfo> {
-	const browser = await createBrowser();
-	const page = await accessPage(
-		browser,
-		'https://www.amazon.com.br/bestsellers',
-	);
+import { insertItemIntoDb } from '../libs/dynamo';
+import { chooseLimit, chooseService } from '../libs/utils';
 
-	await page.exposeFunction(
-		'extractAmazonBestsellingProductsInformation',
-		(carousel: HTMLDivElement) =>
-			extractAmazonBestsellingProductsInformation(carousel),
-	);
-
-	const bestSellingProductsInfo = await page.$eval(
-		'div#zg_left_col1',
-		extractAmazonBestsellingProductsInformation,
-	);
-
-	await browser.close();
-
-	const dynamoDb = new AWS.DynamoDB.DocumentClient();
-	const TABLE_NAME = process.env.DYNAMODB_BESTSELLINGPRODUCTS_TABLE;
-
-	if (TABLE_NAME === null || TABLE_NAME === undefined) {
-		throw new Error('dynamodb table missing');
-	}
-	const putParams = {
-		TableName: TABLE_NAME,
-		Item: {
-			productsId: uuidv4(),
-			BestsellingProducts: bestSellingProductsInfo,
-		},
-	};
-
-	await dynamoDb.put(putParams).promise();
-
-	return bestSellingProductsInfo;
+export interface HTTPResponse {
+	statusCode: 200 | 404 | 400 | 500;
+	body?: string;
 }
 
-export async function bestsellers(): Promise<ProductInfo[]> {
-	const browser = await createBrowser();
-	const page = await accessPage(
-		browser,
-		'https://www.amazon.com.br/bestsellers',
-	);
+export async function allBestsellers(
+	event: APIGatewayProxyEvent,
+): Promise<HTTPResponse> {
+	try {
+		const baseUrl = chooseService(event.queryStringParameters?.service);
 
-	await page.exposeFunction(
-		'extractAmazonBestsellingProductsInformation',
-		(carousel: HTMLDivElement) =>
-			extractAmazonBestsellingProductsInformation(carousel),
-	);
+		const browser = await createBrowser();
+		const page = await accessPage(browser, baseUrl);
 
-	const bestSellingProductsInfo = await page.$eval(
-		'div#zg_left_col1',
-		extractAmazonBestsellingProductsInformation,
-	);
+		const bestSellingProductsInfo = await extractBestsellingProducts(
+			page,
+			baseUrl,
+		);
 
-	const bestsellers: ProductInfo[] = [];
+		await browser.close();
 
-	const firstCarousel: ProductCarouselInfo =
-		bestSellingProductsInfo.productsSortedByCategory[0];
+		const id = await insertItemIntoDb(bestSellingProductsInfo);
 
-	for (let i = 0; i < 3; i++) {
-		// eslint-disable-next-line security/detect-object-injection
-		bestsellers.push(firstCarousel.products[i]);
+		return {
+			statusCode: 200,
+			body: JSON.stringify({ eventId: id, bestSellingProductsInfo }),
+		};
+	} catch (error) {
+		let message: string;
+		if (error instanceof Error) {
+			message = error.message;
+			if (message === 'Service not found, please try again') {
+				return {
+					statusCode: 400,
+					body: JSON.stringify({ message }),
+				};
+			} else if (message.startsWith('net::ERR')) {
+				return {
+					statusCode: 404,
+					body: JSON.stringify({
+						message:
+							'Error connecting to the chosen service, please contact support',
+					}),
+				};
+			} else {
+				return {
+					statusCode: 500,
+					body: JSON.stringify({
+						message,
+					}),
+				};
+			}
+		} else {
+			return {
+				statusCode: 500,
+				body: JSON.stringify({
+					message: 'Internal Server Error. Please try again later.',
+				}),
+			};
+		}
 	}
+}
 
-	await browser.close();
+export async function bestsellers(
+	event: APIGatewayProxyEvent,
+): Promise<HTTPResponse> {
+	try {
+		const baseUrl = chooseService(event.queryStringParameters?.service);
+		const limit = chooseLimit(event.queryStringParameters?.limit);
 
-	const dynamoDb = new AWS.DynamoDB.DocumentClient();
-	const TABLE_NAME = process.env.DYNAMODB_BESTSELLINGPRODUCTS_TABLE;
+		const browser = await createBrowser();
+		const page = await accessPage(browser, baseUrl);
 
-	if (TABLE_NAME === null || TABLE_NAME === undefined) {
-		throw new Error('dynamodb table missing');
+		const bestSellingProductsInfo = await extractBestsellingProducts(
+			page,
+			baseUrl,
+		);
+
+		const bestsellers: ProductInfo[] = [];
+
+		const firstCarousel: ProductCarouselInfo =
+			bestSellingProductsInfo.productsSortedByCategory[0];
+
+		let i = 0;
+		while (i < limit) {
+			// eslint-disable-next-line security/detect-object-injection
+			bestsellers.push(firstCarousel.products[i]);
+			i++;
+		}
+
+		await browser.close();
+
+		const id = await insertItemIntoDb(bestsellers);
+
+		return {
+			statusCode: 200,
+			body: JSON.stringify({ eventId: id, bestsellers }),
+		};
+	} catch (error) {
+		let message: string;
+		if (error instanceof Error) {
+			message = error.message;
+			if (message === 'Service not found, please try again') {
+				return {
+					statusCode: 400,
+					body: JSON.stringify({ message }),
+				};
+			} else if (message.startsWith('net::ERR')) {
+				return {
+					statusCode: 404,
+					body: JSON.stringify({
+						message:
+							'Error connecting to the chosen service, please contact support',
+					}),
+				};
+			} else {
+				return {
+					statusCode: 500,
+					body: JSON.stringify({
+						message,
+					}),
+				};
+			}
+		} else {
+			return {
+				statusCode: 500,
+				body: JSON.stringify({
+					message: 'Internal Server Error. Please try again later.',
+				}),
+			};
+		}
 	}
-	const putParams = {
-		TableName: TABLE_NAME,
-		Item: {
-			productsId: uuidv4(),
-			BestsellingProducts: bestsellers,
-		},
-	};
-
-	await dynamoDb.put(putParams).promise();
-
-	return bestsellers;
 }
