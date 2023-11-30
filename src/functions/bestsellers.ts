@@ -15,22 +15,21 @@ export interface HTTPResponse {
 export async function allBestsellers(
 	event: APIGatewayProxyEvent,
 ): Promise<HTTPResponse> {
+	const baseUrl = chooseService(event.queryStringParameters?.service);
+
+	const browser = await createBrowser();
+	const page = await accessPage(browser, baseUrl);
+
+	let response: HTTPResponse = { statusCode: 200, body: '' };
 	try {
-		const baseUrl = chooseService(event.queryStringParameters?.service);
-
-		const browser = await createBrowser();
-		const page = await accessPage(browser, baseUrl);
-
 		const bestSellingProductsInfo = await extractBestsellingProducts(
 			page,
 			baseUrl,
 		);
 
-		await browser.close();
-
 		const id = await insertItemIntoDb(bestSellingProductsInfo);
 
-		return {
+		response = {
 			statusCode: 200,
 			body: JSON.stringify({ eventId: id, bestSellingProductsInfo }),
 		};
@@ -39,12 +38,12 @@ export async function allBestsellers(
 		if (error instanceof Error) {
 			message = error.message;
 			if (message === 'Service not found, please try again') {
-				return {
+				response = {
 					statusCode: 400,
 					body: JSON.stringify({ message }),
 				};
 			} else if (message.startsWith('net::ERR')) {
-				return {
+				response = {
 					statusCode: 404,
 					body: JSON.stringify({
 						message:
@@ -52,7 +51,7 @@ export async function allBestsellers(
 					}),
 				};
 			} else {
-				return {
+				response = {
 					statusCode: 500,
 					body: JSON.stringify({
 						message,
@@ -60,26 +59,30 @@ export async function allBestsellers(
 				};
 			}
 		} else {
-			return {
+			response = {
 				statusCode: 500,
 				body: JSON.stringify({
 					message: 'Internal Server Error. Please try again later.',
 				}),
 			};
 		}
+	} finally {
+		await browser.close();
 	}
+	return response;
 }
 
 export async function bestsellers(
 	event: APIGatewayProxyEvent,
 ): Promise<HTTPResponse> {
+	const baseUrl = chooseService(event.queryStringParameters?.service);
+	const limit = chooseLimit(event.queryStringParameters?.limit);
+
+	const browser = await createBrowser();
+	const page = await accessPage(browser, baseUrl);
+
+	let response: HTTPResponse = { statusCode: 200, body: '' };
 	try {
-		const baseUrl = chooseService(event.queryStringParameters?.service);
-		const limit = chooseLimit(event.queryStringParameters?.limit);
-
-		const browser = await createBrowser();
-		const page = await accessPage(browser, baseUrl);
-
 		const bestSellingProductsInfo = await extractBestsellingProducts(
 			page,
 			baseUrl,
@@ -97,11 +100,9 @@ export async function bestsellers(
 			i++;
 		}
 
-		await browser.close();
-
 		const id = await insertItemIntoDb(bestsellers);
 
-		return {
+		response = {
 			statusCode: 200,
 			body: JSON.stringify({ eventId: id, bestsellers }),
 		};
@@ -110,12 +111,12 @@ export async function bestsellers(
 		if (error instanceof Error) {
 			message = error.message;
 			if (message === 'Service not found, please try again') {
-				return {
+				response = {
 					statusCode: 400,
 					body: JSON.stringify({ message }),
 				};
 			} else if (message.startsWith('net::ERR')) {
-				return {
+				response = {
 					statusCode: 404,
 					body: JSON.stringify({
 						message:
@@ -123,7 +124,7 @@ export async function bestsellers(
 					}),
 				};
 			} else {
-				return {
+				response = {
 					statusCode: 500,
 					body: JSON.stringify({
 						message,
@@ -131,12 +132,16 @@ export async function bestsellers(
 				};
 			}
 		} else {
-			return {
+			response = {
 				statusCode: 500,
 				body: JSON.stringify({
 					message: 'Internal Server Error. Please try again later.',
 				}),
 			};
 		}
+	} finally {
+		await browser.close();
 	}
+
+	return response;
 }
