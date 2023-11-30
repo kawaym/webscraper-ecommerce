@@ -11,7 +11,9 @@
 		"validate": "concurrently \"pnpm run lint\" \"pnpm type:check\" \"pnpm format:check\"",
 		"commit": "git-cz -S",
 		"deploy:cloud": "sls deploy --verbose",
-		"deploy:local": "sls offline --noTimeout"
+		"predeploy:local": "sls dynamodb install",
+		"deploy:local": "sls offline start --noTimeout -s local",
+		"deploy:test": "sls offline --noTimeout"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^18.4.3",

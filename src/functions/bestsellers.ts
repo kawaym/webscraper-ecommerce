@@ -109,6 +109,7 @@ export async function bestsellers(
 	} catch (error) {
 		let message: string;
 		if (error instanceof Error) {
+			console.log(error);
 			message = error.message;
 			if (message === 'Service not found, please try again') {
 				response = {
