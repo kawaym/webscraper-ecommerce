@@ -8,17 +8,20 @@ export interface event {
 	bestsellers?: ProductInfo[];
 }
 
-export async function insertItemIntoDb(item: any): Promise<string> {
+async function setupDb(): Promise<AWS.DynamoDB.DocumentClient> {
 	const stage = process.env.STAGE;
-	let params = {};
-	let dynamoDb;
 
 	if (stage === 'local') {
-		params = { endpoint: 'http://localhost:8000' };
-		dynamoDb = new AWS.DynamoDB.DocumentClient(params);
-	} else {
-		dynamoDb = new AWS.DynamoDB.DocumentClient();
+		return new AWS.DynamoDB.DocumentClient({
+			endpoint: 'http://localhost:8000',
+		});
 	}
+
+	return new AWS.DynamoDB.DocumentClient();
+}
+
+export async function insertItemIntoDb(item: any): Promise<string> {
+	const db = await setupDb();
 	const id = uuidv4();
 	const TABLE_NAME = process.env.DYNAMODB_BESTSELLINGPRODUCTS_TABLE;
 	if (TABLE_NAME === null || TABLE_NAME === undefined) {
@@ -31,13 +34,13 @@ export async function insertItemIntoDb(item: any): Promise<string> {
 			item,
 		},
 	};
-	await dynamoDb.put(putParams).promise();
+	await db.put(putParams).promise();
 
 	return id;
 }
 
 export async function retrieveItemFromDb(eventId: string): Promise<event> {
-	const dynamoDb = new AWS.DynamoDB.DocumentClient();
+	const db = await setupDb();
 	const TABLE_NAME = process.env.DYNAMODB_BESTSELLINGPRODUCTS_TABLE;
 	if (TABLE_NAME === null || TABLE_NAME === undefined) {
 		throw new Error('dynamodb table missing');
@@ -50,7 +53,7 @@ export async function retrieveItemFromDb(eventId: string): Promise<event> {
 		},
 	};
 
-	const event = await dynamoDb.get(getParams).promise();
+	const event = await db.get(getParams).promise();
 
 	return event.Item as event;
 }
