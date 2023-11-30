@@ -61,6 +61,14 @@ Function names exposed for local invocation by aws-sdk:
 
 This means the application is up and running and can be consumed on <http://localhost:3000>
 
+This script also uses dynamodb-local which requires Java, you can refer to more info [here](https://github.com/raisenational/serverless-dynamodb)
+
+If you want to use with the dynamodb provided by the cloud but still run in your local machine you can use the script:
+
+````bash
+npm run deploy:test
+````
+
 Alternativaly, you can deploy it on AWS, using the Cloudformation provided by Serverless deployment:
 
 ```bash

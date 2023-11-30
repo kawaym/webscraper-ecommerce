@@ -59,7 +59,7 @@ export async function extractBestsellingProducts(
 	);
 
 	bestSellingProductsInfo = await page.$eval(
-		'div#zg_left_col1',
+		'div#zg_col1',
 		extractAmazonBestsellingProductsInformation,
 	);
 

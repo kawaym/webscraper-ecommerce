@@ -6,19 +6,21 @@ import { retrieveItemFromDb } from '../libs/dynamo';
 export async function readEvent(
 	event: APIGatewayProxyEvent,
 ): Promise<HTTPResponse> {
+	let response: HTTPResponse = { statusCode: 200, body: '' };
 	try {
 		const id = event.pathParameters?.id;
 		if (id === null || id === undefined) {
-			return {
+			response = {
 				statusCode: 400,
 				body: JSON.stringify({ message: 'Please insert an id.' }),
 			};
+			return response;
 		}
 
 		const retrievedEvent = await retrieveItemFromDb(id);
 
 		if (retrievedEvent === null || retrievedEvent === undefined) {
-			return {
+			response = {
 				statusCode: 404,
 				body: JSON.stringify({ message: 'Event not found' }),
 			};
@@ -26,11 +28,13 @@ export async function readEvent(
 
 		return { statusCode: 200, body: JSON.stringify({ retrievedEvent }) };
 	} catch (error) {
-		return {
+		response = {
 			statusCode: 500,
 			body: JSON.stringify({
 				message: 'Internal Server Error. Please try again later.',
 			}),
 		};
 	}
+
+	return response;
 }
