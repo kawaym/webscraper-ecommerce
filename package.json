@@ -20,6 +20,7 @@
 		"@types/follow-redirects": "^1.14.4",
 		"@types/uuid": "^9.0.7",
 		"@typescript-eslint/eslint-plugin": "^6.4.0",
+		"aws-dynamodb-local": "^0.0.11",
 		"commitizen": "^4.3.0",
 		"concurrently": "^8.2.2",
 		"cz-conventional-changelog": "^3.3.0",
@@ -34,6 +35,7 @@
 		"eslint-plugin-security": "^1.7.1",
 		"husky": "^8.0.3",
 		"prettier": "^3.1.0",
+		"serverless-dynamodb": "^0.2.47",
 		"serverless-esbuild": "^1.49.0",
 		"serverless-offline": "^13.3.0",
 		"serverless-plugin-typescript": "^2.1.5",
@@ -53,7 +55,6 @@
 		"aws-lambda": "^1.0.7",
 		"aws-sdk": "^2.1503.0",
 		"puppeteer-core": "^21.5.2",
-		"serverless-dynamodb-local": "^0.2.40",
 		"uuid": "^9.0.1"
 	}
 }

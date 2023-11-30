@@ -24,12 +24,20 @@ custom:
       - '@sparticuz/chromium'
       - 'puppeteer-core'
     exclude: []
+  serverless-dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
 
 provider:
   name: aws
   runtime: nodejs18.x
   environment:
     DYNAMODB_BESTSELLINGPRODUCTS_TABLE: ${self:service}-bestsellingProductsTable-${sls:stage}
+    STAGE: ${sls:stage}
   iam:
     role:
       statements:
@@ -68,7 +76,7 @@ functions:
 
 plugins:
   - serverless-esbuild
-  - serverless-dynamodb-local
+  - serverless-dynamodb
   - serverless-offline
 
 package:
