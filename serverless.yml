@@ -55,24 +55,28 @@ functions:
       - httpApi:
           method: get
           path: /health
+    timeout: 30
   allBestsellers:
     handler: ./src/functions/bestsellers.allBestsellers
     events:
       - httpApi:
           method: get
           path: /bestsellers/all
+    timeout: 30
   bestsellers:
     handler: ./src/functions/bestsellers.bestsellers
     events:
       - httpApi:
           method: get
           path: /bestsellers
+    timeout: 30
   events:
     handler: ./src/functions/events.readEvent
     events:
       - httpApi:
           method: get
           path: /events/{id}
+    timeout: 30
 
 plugins:
   - serverless-esbuild
