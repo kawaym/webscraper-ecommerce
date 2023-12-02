@@ -65,9 +65,9 @@ This script also uses dynamodb-local which requires Java, you can refer to more 
 
 If you want to use with the dynamodb provided by the cloud but still run in your local machine you can use the script:
 
-````bash
+```bash
 npm run deploy:test
-````
+```
 
 Alternativaly, you can deploy it on AWS, using the Cloudformation provided by Serverless deployment:
 
