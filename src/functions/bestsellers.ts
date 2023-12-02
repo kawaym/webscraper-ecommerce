@@ -94,7 +94,7 @@ export async function bestsellers(
 			bestSellingProductsInfo.productsSortedByCategory[0];
 
 		let i = 0;
-		while (i < limit) {
+		while (i < limit && i < firstCarousel.products.length) {
 			// eslint-disable-next-line security/detect-object-injection
 			bestsellers.push(firstCarousel.products[i]);
 			i++;
